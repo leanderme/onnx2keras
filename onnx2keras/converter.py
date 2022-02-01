@@ -169,8 +169,8 @@ def onnx_to_keras(onnx_model, input_names,
                     layers[node_input] = weights[node_input]
                 else:
                     raise AttributeError('Current node is not in weights / model inputs / layers.')
-        else:
-            logger.debug('... found all, continue')
+            else:
+                logger.debug('... found all, continue')
 
         keras.backend.set_image_data_format('channels_first')
         AVAILABLE_CONVERTERS[node_type](
