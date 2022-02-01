@@ -284,8 +284,10 @@ def onnx_to_keras(onnx_model, input_names,
                 
             try:
                 dst_layer.set_weights(W)
+                print("Transferred weights for layer {}".format(dst_layer.name))
             except:
-                print("Could not transfer weights for layer {}".format(dst_layer.name))            
+                print("Could not transfer weights for layer {}".format(dst_layer.name))
+                pass
 
         model = model_tf_ordering
 
