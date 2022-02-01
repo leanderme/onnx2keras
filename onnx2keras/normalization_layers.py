@@ -4,6 +4,11 @@ import tensorflow_addons as tfa
 import logging
 from .utils import ensure_tf_type, ensure_numpy_type
 
+import string
+import random
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
 
 def convert_batchnorm(node, params, layers, lambda_func, node_name, keras_name):
     """
@@ -17,6 +22,8 @@ def convert_batchnorm(node, params, layers, lambda_func, node_name, keras_name):
     :return: None
     """
     logger = logging.getLogger('onnx2keras.batchnorm2d')
+    
+    print("batchnorm - keras_name", keras_name)
 
     input_0 = ensure_tf_type(layers[node.input[0]], name="%s_const" % keras_name)
 
@@ -37,6 +44,11 @@ def convert_batchnorm(node, params, layers, lambda_func, node_name, keras_name):
 
     eps = params['epsilon'] if 'epsilon' in params else 1e-05  # default epsilon
     momentum = params['momentum'] if 'momentum' in params else 0.9  # default momentum
+    
+    if isinstance(keras_name, str):
+        name = keras_name
+    else:
+        name = params['name'] if 'name' in params else 'batch_norm' + id_generator()
 
     if len(weights) == 2:
         logger.debug('Batch normalization without running averages')
@@ -50,7 +62,7 @@ def convert_batchnorm(node, params, layers, lambda_func, node_name, keras_name):
         bn = keras.layers.BatchNormalization(
             axis=1, momentum=momentum, epsilon=eps,
             weights=weights,
-            name=keras_name
+            name=name
         )
 
     layers[node_name] = bn(input_0)
