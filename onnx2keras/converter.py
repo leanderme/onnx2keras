@@ -281,7 +281,11 @@ def onnx_to_keras(onnx_model, input_names,
             # TODO: check axes first (if it's not 4D tensor)
             if conf['config'] and 'shared_axes' in conf['config']:
                 W[0] = W[0].transpose(1, 2, 0)
-            dst_layer.set_weights(W)
+                
+            try:
+                dst_layer.set_weights(W)
+            except:
+                print("Could not transfer weights for layer {}".format(dst_layer.name))            
 
         model = model_tf_ordering
 
